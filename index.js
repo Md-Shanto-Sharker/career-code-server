@@ -29,6 +29,10 @@ async function run() {
 
     const jobsCollection = client.db("CareerCode").collection("jobs");
 
+    const ApplicationsCollection = client
+      .db("CareerCode")
+      .collection("applications");
+
     // jobs Api
     app.get("/jobs", async (req, res) => {
       const cursor = jobsCollection.find();
@@ -42,6 +46,33 @@ async function run() {
       const result = await jobsCollection.findOne(query);
       res.send(result);
     });
+
+    // job applications related apis
+
+    app.get("/applications", async (req, res) => {
+      const email = req.query.email;
+      const query = {
+        applicant: email,
+      };
+      const result = await ApplicationsCollection.find(query).toArray();
+      for (const application of result) {
+        const jobId = application.jobId;
+        const jobQuery = { _id: new ObjectId(jobId) };
+        const job = await jobsCollection.findOne(jobQuery);
+        application.company = job.company;
+        application.title = job.title;
+        application.company_logo = job.company_logo;
+      }
+      res.send(result);
+    });
+
+    app.post("/applications", async (req, res) => {
+      const application = req.body;
+      console.log(application);
+      const result = await ApplicationsCollection.insertOne(application);
+      res.send(result);
+    });
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
