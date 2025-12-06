@@ -1,7 +1,7 @@
 const express = require("express");
-const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
-require("dotenv").config();
+const { MongoClient, ServerApiVersion } = require("mongodb");
 const cors = require("cors");
+require("dotenv").config();
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -9,10 +9,8 @@ const port = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.hy50zfn.mongodb.net/?appName=Cluster0`;
-
-// console.log(process.env.DB_USER);
-// console.log(process.env.DB_PASSWORD);
+const uri =
+  "mongodb+srv://<db_username>:<db_password>@cluster0.hy50zfn.mongodb.net/?appName=Cluster0";
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
@@ -27,26 +25,6 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
-
-    // jobs api
-    const jobsCollections = client.db("CareerCode").collection("jobs");
-
-    app.get("/jobs", async (req, res) => {
-      const cursor = jobsCollections.find();
-      const result = await cursor.toArray();
-      res.send(result);
-      // console.log(jobs);
-    });
-
-    app.get("/jobs/:id", async (req, res) => {
-      const id = req.params.id;
-      const query = { _id: new ObjectId(id) };
-      const cursor = await jobsCollections.findOne(query);
-      // const result =  cursor.toArray();
-      res.send(cursor);
-      // console.log(jobs);
-    });
-
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
@@ -60,9 +38,9 @@ async function run() {
 run().catch(console.dir);
 
 app.get("/", (req, res) => {
-  res.send("Career Code Cooking");
+  res.send("Career Code is Cooking");
 });
 
 app.listen(port, () => {
-  console.log(`Career Code Server is running on port ${port}`);
+  console.log(`Career Code server is running on port ${port}`);
 });
